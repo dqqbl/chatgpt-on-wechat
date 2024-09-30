@@ -27,7 +27,7 @@ class DashscopeBot(Bot):
         self.model_name = conf().get("model") or "qwen-plus"
         self.api_key = conf().get("dashscope_api_key")
         os.environ["DASHSCOPE_API_KEY"] = self.api_key
-        self.client = dashscope.Generation
+        self.client = dashscope.Application
 
     def reply(self, query, context=None):
         # acquire reply content
@@ -51,7 +51,7 @@ class DashscopeBot(Bot):
             session = self.sessions.session_query(query, session_id)
             logger.debug("[DASHSCOPE] session query={}".format(session.messages))
 
-            reply_content = self.reply_text(session)
+            reply_content = self.reply_text(session, 0, query)
             logger.debug(
                 "[DASHSCOPE] new_query={}, session_id={}, reply_cont={}, completion_tokens={}".format(
                     session.messages,
@@ -73,7 +73,7 @@ class DashscopeBot(Bot):
             reply = Reply(ReplyType.ERROR, "Bot不支持处理{}类型的消息".format(context.type))
             return reply
 
-    def reply_text(self, session: DashscopeSession, retry_count=0) -> dict:
+    def reply_text(self, session: DashscopeSession, retry_count=0, query='') -> dict:
         """
         call openai's ChatCompletion to get the answer
         :param session: a conversation session
@@ -84,17 +84,27 @@ class DashscopeBot(Bot):
         try:
             dashscope.api_key = self.api_key
             response = self.client.call(
-                dashscope_models[self.model_name],
-                messages=session.messages,
-                result_format="message"
+                app_id = conf().get("qwen_app_id"),
+                prompt = query,
             )
+            # response = self.client.call(
+            #     dashscope_models[self.model_name],
+            #     messages=session.messages,
+            #     result_format="message"
+            # )
             if response.status_code == HTTPStatus.OK:
-                content = response.output.choices[0]["message"]["content"]
+                content = response.output.text
                 return {
-                    "total_tokens": response.usage["total_tokens"],
-                    "completion_tokens": response.usage["output_tokens"],
+                    "total_tokens": response.usage["models"][0]["input_tokens"] + response.usage["models"][0]["output_tokens"],
+                    "completion_tokens": response.usage["models"][0]["output_tokens"],
                     "content": content,
                 }
+                # content = response.output.choices[0]["message"]["content"]
+                # return {
+                #     "total_tokens": response.usage["total_tokens"],
+                #     "completion_tokens": response.usage["output_tokens"],
+                #     "content": content,
+                # }
             else:
                 logger.error('Request id: %s, Status code: %s, error code: %s, error message: %s' % (
                     response.request_id, response.status_code,
