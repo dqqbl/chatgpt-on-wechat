@@ -49,10 +49,10 @@ class DashscopeBot(Bot):
             if reply:
                 return reply
             session = self.sessions.session_query(query, session_id)
-            logger.debug("[DASHSCOPE] session query={}".format(session.messages))
+            logger.info("[DASHSCOPE] session query={}".format(session.messages))
 
             reply_content = self.reply_text(session, 0, query)
-            logger.debug(
+            logger.info(
                 "[DASHSCOPE] new_query={}, session_id={}, reply_cont={}, completion_tokens={}".format(
                     session.messages,
                     session_id,
@@ -63,7 +63,7 @@ class DashscopeBot(Bot):
             if reply_content["completion_tokens"] == 0 and len(reply_content["content"]) > 0:
                 reply = Reply(ReplyType.ERROR, reply_content["content"])
             elif reply_content["completion_tokens"] > 0:
-                self.sessions.session_reply(reply_content["content"], session_id, reply_content["total_tokens"])
+                self.sessions.session_reply(reply_content["content"], session_id, reply_content["total_tokens"], reply_content['reply_session_id'])
                 reply = Reply(ReplyType.TEXT, reply_content["content"])
             else:
                 reply = Reply(ReplyType.ERROR, reply_content["content"])
@@ -83,9 +83,12 @@ class DashscopeBot(Bot):
         """
         try:
             dashscope.api_key = self.api_key
+            
+            session_id = session.get('reply_session_id')
             response = self.client.call(
                 app_id = conf().get("qwen_app_id"),
                 prompt = query,
+                session_id = session_id
             )
             # response = self.client.call(
             #     dashscope_models[self.model_name],
@@ -94,10 +97,12 @@ class DashscopeBot(Bot):
             # )
             if response.status_code == HTTPStatus.OK:
                 content = response.output.text
+                reply_session_id = response.output.session_id
                 return {
                     "total_tokens": response.usage["models"][0]["input_tokens"] + response.usage["models"][0]["output_tokens"],
                     "completion_tokens": response.usage["models"][0]["output_tokens"],
                     "content": content,
+                    "reply_session_id": reply_session_id,
                 }
                 # content = response.output.choices[0]["message"]["content"]
                 # return {
