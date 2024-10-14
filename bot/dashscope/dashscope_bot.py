@@ -83,12 +83,11 @@ class DashscopeBot(Bot):
         """
         try:
             dashscope.api_key = self.api_key
-            
-            session_id = session.get('reply_session_id')
+
             response = self.client.call(
                 app_id = conf().get("qwen_app_id"),
                 prompt = query,
-                session_id = session_id
+                session_id = session.reply_session_id if session.reply_session_id else None
             )
             # response = self.client.call(
             #     dashscope_models[self.model_name],
