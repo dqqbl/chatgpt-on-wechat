@@ -30,7 +30,7 @@ class Session(object):
         assistant_item = {"role": "assistant", "content": reply}
         self.messages.append(assistant_item)
     def add_reply_session_id(self, reply_session_id):
-        self['reply_session_id'] = reply_session_id
+        self.reply_session_id = reply_session_id
 
     def discard_exceeding(self, max_tokens=None, cur_tokens=None):
         raise NotImplementedError
