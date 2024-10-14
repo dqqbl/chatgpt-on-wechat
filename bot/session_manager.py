@@ -6,7 +6,7 @@ from config import conf
 class Session(object):
     def __init__(self, session_id, system_prompt=None):
         self.session_id = session_id
-        self.reply_session_id = ''
+        # self.reply_session_id = ''
         self.messages = []
         if system_prompt is None:
             self.system_prompt = conf().get("character_desc", "")
@@ -78,8 +78,8 @@ class SessionManager(object):
     def session_reply(self, reply, session_id, total_tokens=None, reply_session_id=None):
         session = self.build_session(session_id)
         session.add_reply(reply)
-        if reply_session_id:
-            session.add_reply_session_id(reply_session_id)
+        # if reply_session_id:
+        #     session.add_reply_session_id(reply_session_id)
         try:
             max_tokens = conf().get("conversation_max_tokens", 1000)
             tokens_cnt = session.discard_exceeding(max_tokens, total_tokens)

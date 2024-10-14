@@ -90,7 +90,7 @@ class DashscopeBot(Bot):
             response = self.client.call(
                 app_id = conf().get("qwen_app_id"),
                 prompt = query,
-                session_id = session.reply_session_id if session.reply_session_id else None
+                # session_id = session.reply_session_id if session.reply_session_id else None
             )
             # response = self.client.call(
             #     dashscope_models[self.model_name],
