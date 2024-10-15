@@ -66,6 +66,7 @@ class ChatChannel(Channel):
                 ):
                     group_chat_in_one_session = conf().get("group_chat_in_one_session", [])
                     session_id = cmsg.actual_user_id
+                    logger.info(f"local_session_id is cmsg.actual_user_id, cmsg.actual_user_id={cmsg.actual_user_id}")
                     if any(
                         [
                             group_name in group_chat_in_one_session,
@@ -73,6 +74,7 @@ class ChatChannel(Channel):
                         ]
                     ):
                         session_id = group_id
+                        logger.info(f"local_session_id is group_id, group_name={group_id}")
                 else:
                     logger.debug(f"No need reply, groupName not in whitelist, group_name={group_name}")
                     return None
@@ -81,6 +83,7 @@ class ChatChannel(Channel):
             else:
                 context["session_id"] = cmsg.other_user_id
                 context["receiver"] = cmsg.other_user_id
+                logger.info(f"local_session_id is cmsg.other_user_id={cmsg.other_user_id}")
             e_context = PluginManager().emit_event(EventContext(Event.ON_RECEIVE_MESSAGE, {"channel": self, "context": context}))
             context = e_context["context"]
             if e_context.is_pass() or context is None:
