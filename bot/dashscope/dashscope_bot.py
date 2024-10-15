@@ -48,7 +48,7 @@ class DashscopeBot(Bot):
                 reply = Reply(ReplyType.INFO, "配置已更新")
             if reply:
                 return reply
-            logger.info("[DASHSCOPE] call local session_id={}".format(session_id))
+            logger.info("[DASHSCOPE] call local_session_id={}".format(session_id))
             session = self.sessions.session_query(query, session_id)
             logger.info("[DASHSCOPE] local session.messages={}".format(session.messages))
 
@@ -86,7 +86,7 @@ class DashscopeBot(Bot):
         try:
             dashscope.api_key = self.api_key
             logger.info("[DASHSCOPE] call prompt={}".format(query))
-            logger.info("[DASHSCOPE] call session_id={}".format(session.reply_session_id))
+            logger.info("[DASHSCOPE] call reply_session_id={}".format(session.reply_session_id))
             response = self.client.call(
                 app_id = conf().get("qwen_app_id"),
                 prompt = query,
