@@ -6,7 +6,7 @@ from config import conf
 class Session(object):
     def __init__(self, session_id, system_prompt=None):
         self.session_id = session_id
-        # self.reply_session_id = ''
+        self.reply_session_id = ''
         self.messages = []
         if system_prompt is None:
             self.system_prompt = conf().get("character_desc", "")
