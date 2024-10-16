@@ -86,11 +86,11 @@ class DashscopeBot(Bot):
         try:
             dashscope.api_key = self.api_key
             logger.info("[DASHSCOPE] call prompt={}".format(query))
-            # logger.info("[DASHSCOPE] call reply_session_id={}".format(session.reply_session_id))
+            logger.info("[DASHSCOPE] call reply_session_id={}".format(session.reply_session_id))
             response = self.client.call(
                 app_id = conf().get("qwen_app_id"),
                 prompt = query,
-                # session_id = session.reply_session_id if session.reply_session_id else None
+                session_id = session.reply_session_id if session.reply_session_id else None
             )
             # response = self.client.call(
             #     dashscope_models[self.model_name],

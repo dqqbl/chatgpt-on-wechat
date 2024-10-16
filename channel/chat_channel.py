@@ -77,12 +77,13 @@ class ChatChannel(Channel):
                         ]
                     ):
                         session_id = group_id
-                        logger.info(f"local_session_id is group_id, group_name={group_id}")
+                        logger.info(f"local_session_id is group_id, group_id={group_id}")
                 else:
                     logger.debug(f"No need reply, groupName not in whitelist, group_name={group_name}")
                     return None
                 context["session_id"] = session_id
                 context["receiver"] = group_id
+                logger.info(f"local_session_id in group, local_session_id={cmsg.other_user_id}")
             else:
                 context["session_id"] = cmsg.other_user_id
                 context["receiver"] = cmsg.other_user_id
