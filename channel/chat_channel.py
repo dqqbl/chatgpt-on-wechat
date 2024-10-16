@@ -44,13 +44,16 @@ class ChatChannel(Channel):
             context["origin_ctype"] = ctype
         # context首次传入时，receiver是None，根据类型设置receiver
         first_in = "receiver" not in context
+        logger.info("------- _compose_context init  ---------")
         # 群名匹配过程，设置session_id和receiver
         if first_in:  # context首次传入时，receiver是None，根据类型设置receiver
+            logger.info("------- is first in ---------")
             config = conf()
             cmsg = context["msg"]
             user_data = conf().get_user_data(cmsg.from_user_id)
             context["openai_api_key"] = user_data.get("openai_api_key")
             context["gpt_model"] = user_data.get("gpt_model")
+            logger.info(f"isgroup, group_name={context.get("isgroup", False)}")
             if context.get("isgroup", False):
                 group_name = cmsg.other_user_nickname
                 group_id = cmsg.other_user_id
